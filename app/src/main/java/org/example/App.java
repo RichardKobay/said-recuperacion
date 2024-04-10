@@ -12,10 +12,17 @@ public class App {
     }
 
     public static void main(String[] args) {
+        SheetsAndJava sheetsAndJava = new SheetsAndJava();
         try {
-            SheetsAndJava.start();
+            sheetsAndJava.start();
         } catch (IOException | GeneralSecurityException e) {
             throw new RuntimeException(e);
+        }
+
+        try {
+            new PDF().generatePDF(sheetsAndJava.getProfessors());
+        } catch (IOException e) {
+            System.err.println(e);
         }
     }
 }
