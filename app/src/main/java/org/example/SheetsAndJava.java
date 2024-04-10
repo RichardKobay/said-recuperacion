@@ -1,12 +1,10 @@
 package org.example;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,8 +14,6 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 
@@ -62,22 +58,49 @@ public class SheetsAndJava {
         ).setApplicationName(APPLICATION_NAME).build();
     }
 
-    public static void start() throws IOException, GeneralSecurityException {
+    public static void start() throws GeneralSecurityException, IOException {
+
+        for (Professor professor : SheetsAndJava.firstPage()) {
+            System.out.println("Name: " + professor.getName() + " Hours: " + professor.getHours());
+        }
+    }
+
+    public static Professor[] firstPage() throws IOException, GeneralSecurityException {
         sheetsService = getSheetsService();
-        String range = "matrizITI!F4:AJ81";
+        String range = "matrizIM!F4:AJ81";
+//        String namesRange = "matrizITI!F2:AJ2";
         ValueRange response = sheetsService.spreadsheets().values().get(SPREADSHEET_ID, range).execute();
+//        ValueRange namesResponse = sheetsService.spreadsheets().values().get(SPREADSHEET_ID, namesRange).execute();
 
         List<List<Object>> values = response.getValues();
+//        List<List<Object>> names = namesResponse.getValues();
 
-        if (values == null || values.isEmpty()) {
+        if ((values == null || values.isEmpty()) /*|| (names == null || names.isEmpty())*/) {
             System.out.println("No data found");
-            return;
+            throw new IOException();
         }
 
-        System.out.println(values);
+        Professor[] professors = new Professor[31];
 
-        for (List row : values) {
-            System.out.printf("\n");
+//        for (List<Object> row : names) {
+//            for (int i = 0; i < row.size(); i++) {
+//                String name = row.get(i).toString();
+//                professors[i] = new Professor(name);
+//            }
+//        }
+
+        for (int i = 0; i < professors.length; i++) {
+            professors[i] = new Professor();
         }
+
+        for (List<Object> row : values) {
+            for (int j = 0; j < row.size(); j++) {
+                Object item = row.get(j);
+                int itemInteger = ExceptionHandling.toInt(item);
+                professors[j].setHours(professors[j].getHours() + itemInteger);
+            }
+        }
+
+        return professors;
     }
 }
