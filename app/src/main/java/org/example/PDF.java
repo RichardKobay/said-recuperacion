@@ -16,7 +16,7 @@ public class PDF {
     public void generatePDF(Professor[] professors) throws FileNotFoundException {
 
         URL resourceUrl;
-        String absolutePath = null;
+        String absolutePath;
 
         resourceUrl = getClass().getResource("/nominas.pdf");
         absolutePath = Objects.requireNonNull(resourceUrl).getPath();
