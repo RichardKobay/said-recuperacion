@@ -24,7 +24,7 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 public class SheetsAndJava {
     private Sheets sheetsService;
     private final String APPLICATION_NAME = "Google Sheets Example";
-    private final String SPREADSHEET_ID = "1pLgKaAENH1mYW3fAKpcGq8GSCt0V8epyuVdbBg2caqk";
+
     private Professor[] professors;
 
     public SheetsAndJava() {
@@ -33,10 +33,6 @@ public class SheetsAndJava {
 
     public Professor[] getProfessors() {
         return professors;
-    }
-
-    public void setProfessors(Professor[] professors) {
-        this.professors = professors;
     }
 
     private Credential authorize() throws IOException, GeneralSecurityException {
@@ -56,16 +52,19 @@ public class SheetsAndJava {
     }
 
     public void start() throws GeneralSecurityException, IOException {
+
+        String[] ids = Txt.getIDs();
+
         for (int i = 0; i < this.professors.length; i++)
             this.professors[i] = new Professor();
 
-        this.getNames();
-        this.getHours("matrizITI!F4:AJ81", "ITI");
-        this.getHours("matrizIM!F4:AJ81", "IM");
-        this.getHours("matrizITM!F4:AJ81", "ITM");
-        this.getHours("matrizISA!F4:AJ81", "ISA");
-        this.getHours("matrizLAyGE!F4:AJ81", "LAyGE");
-        this.getHours("matrizComercio!F4:AJ81", "Comercio");
+        this.getNames(ids[0]);
+        this.getHours("matriz!F4:AJ81", "ITI", ids[0]);
+        this.getHours("matriz!F4:AJ81", "IM", ids[1]);
+        this.getHours("matriz!F4:AJ81", "ITM", ids[2]);
+        this.getHours("matriz!F4:AJ81", "ISA", ids[3]);
+        this.getHours("matriz!F4:AJ81", "LAyGE", ids[4]);
+        this.getHours("matriz!F4:AJ81", "Comercio", ids[5]);
 
         int totalHours = 0;
         for (Professor professor : this.professors) {
@@ -78,10 +77,10 @@ public class SheetsAndJava {
         System.out.println("Total of hours: " + totalHours);
     }
 
-    public void getNames() throws GeneralSecurityException, IOException {
+    public void getNames(String id) throws GeneralSecurityException, IOException {
         sheetsService = getSheetsService();
-        String namesRange = "matrizITI!F2:AJ2";
-        ValueRange namesResponse = sheetsService.spreadsheets().values().get(SPREADSHEET_ID, namesRange).execute();
+        String namesRange = "matriz!F2:AJ2";
+        ValueRange namesResponse = sheetsService.spreadsheets().values().get(id, namesRange).execute();
 
         List<List<Object>> names = namesResponse.getValues();
 
@@ -98,9 +97,9 @@ public class SheetsAndJava {
         }
     }
 
-    public void getHours(String range, String career) throws IOException, GeneralSecurityException {
+    public void getHours(String range, String career, String id) throws IOException, GeneralSecurityException {
         sheetsService = getSheetsService();
-        ValueRange response = sheetsService.spreadsheets().values().get(SPREADSHEET_ID, range).execute();
+        ValueRange response = sheetsService.spreadsheets().values().get(id, range).execute();
 
         List<List<Object>> values = response.getValues();
 
